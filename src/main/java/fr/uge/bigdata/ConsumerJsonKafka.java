@@ -1,4 +1,7 @@
 package fr.uge.bigdata;
+
+import fr.uge.bigdata.data.Etudiant;
+import fr.uge.bigdata.serializer.EtudiantSerializer;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
@@ -6,17 +9,17 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
-public class ConsumerKafka {
+public class ConsumerJsonKafka {
     static void main(String[] args) {
         // Set up the consumer properties
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "my-group-id");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, EtudiantSerializer.class.getName());
 
         // Create the consumer
-        Consumer<String, String> consumer = new KafkaConsumer<>(props);
+        Consumer<String, Etudiant> consumer = new KafkaConsumer<>(props);
 
         // Subscribe to the topic
 
@@ -24,9 +27,12 @@ public class ConsumerKafka {
         try (consumer) {
             consumer.subscribe(Collections.singletonList("Messages"));
             while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-                for (ConsumerRecord<String, String> record : records) {
-                    System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
+                ConsumerRecords<String, Etudiant> records = consumer.poll(Duration.ofMillis(100));
+                for (ConsumerRecord<String, Etudiant> record : records) {
+                    System.out.printf("Partition: %d | Valeur: %s %s%n",
+                            record.partition(),
+                            record.value().firstName(),
+                            record.value().lastName());
                 }
             }
         }

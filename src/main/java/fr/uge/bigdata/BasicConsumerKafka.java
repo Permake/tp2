@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 
-public class ConsumerKafka {
+public class BasicConsumerKafka {
     static void main(String[] args) {
         // Set up the consumer properties
         Properties props = new Properties();
@@ -19,17 +19,19 @@ public class ConsumerKafka {
         Consumer<String, String> consumer = new KafkaConsumer<>(props);
 
         // Subscribe to the topic
+        consumer.subscribe(Collections.singletonList("Messages"));
 
         // Continuously poll for new messages
-        try (consumer) {
-            consumer.subscribe(Collections.singletonList("Messages"));
+        try {
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord<String, String> record : records) {
                     System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
                 }
             }
+        } finally {
+            // Close the consumer
+            consumer.close();
         }
-        // Close the consumer
     }
 }
