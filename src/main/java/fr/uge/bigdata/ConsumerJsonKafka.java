@@ -1,7 +1,7 @@
 package fr.uge.bigdata;
 
 import fr.uge.bigdata.data.Etudiant;
-import fr.uge.bigdata.serializer.EtudiantSerializer;
+import fr.uge.bigdata.serializer.EtudiantDeserializer;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
@@ -16,12 +16,10 @@ public class ConsumerJsonKafka {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "my-group-id");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, EtudiantSerializer.class.getName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, EtudiantDeserializer.class.getName());
 
         // Create the consumer
         Consumer<String, Etudiant> consumer = new KafkaConsumer<>(props);
-
-        // Subscribe to the topic
 
         // Continuously poll for new messages
         try (consumer) {
